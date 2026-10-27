@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Temper — snap your own chocolate box</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,800;1,9..144,500&family=Bricolage+Grotesque:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f8dcd6;--ink:#2a1117;--panel:#fff1ee;--ruby:#c4235f;--pist:#8fb06e;--foil:#d9a02e;--cocoa:#4a2318;--line:rgba(42,17,23,.18);
+  --serif:"Fraunces",Georgia,serif;--sans:"Bricolage Grotesque",system-ui,sans-serif;
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#2a1117;--ink:#f8dcd6;--panel:#3a1a22;--ruby:#ee5c93;--line:rgba(248,220,214,.2)}}
+:root[data-theme="dark"]{--bg:#2a1117;--ink:#f8dcd6;--panel:#3a1a22;--ruby:#ee5c93;--line:rgba(248,220,214,.2)}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 17px/1.55 var(--sans);min-height:100%}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--ruby);outline-offset:3px}
+header{display:flex;justify-content:space-between;align-items:center;padding:20px clamp(18px,5vw,56px)}
+.logo{font:800 30px/1 var(--serif);letter-spacing:-.02em}
+.logo i{color:var(--ruby);font-weight:500}
+.bagbtn{border:2px solid var(--ink);background:none;border-radius:99px;padding:8px 18px;font-weight:600}
+.bagbtn b{display:inline-block;min-width:22px;margin-left:6px;background:var(--ink);color:var(--bg);border-radius:99px;padding:0 7px;text-align:center}
+main{padding:0 clamp(18px,5vw,56px) 60px;max-width:1180px;margin:0 auto}
+h1{font:800 clamp(40px,7.5vw,92px)/.95 var(--serif);letter-spacing:-.035em;margin:14px 0 18px;max-width:11ch}
+h1 em{font-weight:500}
+.lede{max-width:46ch;font-size:19px;margin:0 0 30px}
+/* the bar */
+.stage{background:#1c0a0f;border-radius:28px;padding:clamp(14px,3vw,30px);position:relative;margin-bottom:8px}
+.bar{display:grid;grid-template-columns:repeat(6,1fr);gap:clamp(5px,1.2vw,12px);position:relative;--h:0}
+.sq{all:unset;aspect-ratio:1;position:relative;cursor:pointer;border-radius:10px;display:block}
+.sq:focus-visible{outline:3px solid var(--foil);outline-offset:2px}
+.face{position:absolute;inset:0;border-radius:calc(8px + var(--h)*16px);background:linear-gradient(145deg,color-mix(in srgb,var(--c) 78%,#fff),var(--c));
+  box-shadow:inset 3px 3px 0 rgba(255,255,255,.2),inset -4px -4px 0 rgba(0,0,0,.28),0 5px 0 rgba(0,0,0,.35);
+  transform:translateY(calc(var(--h)*var(--d)*1px)) rotate(calc(var(--h)*var(--r)*1deg)) scale(calc(1 + var(--h)*.05));
+  animation:drop .7s cubic-bezier(.3,1.5,.5,1) both;animation-delay:calc(var(--i)*45ms);transition:transform .2s}
+.face::after{content:"";position:absolute;inset:18%;border-radius:6px;box-shadow:inset 2px 2px 0 rgba(0,0,0,.22),inset -2px -2px 0 rgba(255,255,255,.14)}
+.sq:hover .face{filter:brightness(1.12)}
+.ready .face{animation:none}
+.sq.gone{outline:2px dashed rgba(248,220,214,.35);outline-offset:-2px}
+.ready .sq.gone .face{animation:snap .65s cubic-bezier(.5,0,.9,.5) forwards}
+@keyframes drop{from{transform:translateY(-140%) rotate(-14deg);opacity:0}to{opacity:1}}
+@keyframes snap{0%{transform:none}12%{transform:rotate(-5deg) translateY(-4px)}22%{transform:rotate(4deg) translateY(-6px)}100%{transform:translate(18px,220px) rotate(34deg);opacity:0}}
+.drips{display:grid;grid-template-columns:repeat(12,1fr);gap:0 6px;height:0;margin-top:-4px;pointer-events:none}
+.drips span{display:block;height:calc(var(--h)*var(--l)*1px);background:linear-gradient(#4a2318,#2f140e);border-radius:0 0 99px 99px;transition:height .2s}
+.controls{display:flex;flex-wrap:wrap;gap:14px 28px;align-items:center;padding:20px 4px 6px;color:#f8dcd6}
+.controls label{font-weight:600}
+input[type=range]{accent-color:var(--foil);width:min(280px,100%);height:28px}
+.hint{margin-left:auto;font:500 italic 18px var(--serif);min-width:16ch}
+.tray{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;background:var(--panel);border:2px solid var(--line);border-radius:22px;padding:18px 22px;margin-top:18px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;flex:1;min-width:200px}
+.chip{display:inline-flex;align-items:center;gap:8px;background:var(--bg);border-radius:99px;padding:4px 14px 4px 6px;font-weight:600;font-size:15px}
+.chip i{width:18px;height:18px;border-radius:5px;background:var(--c)}
+.empty{opacity:.7}
+.cta{background:var(--ruby);color:#fff;border:0;border-radius:99px;padding:14px 26px;font-weight:600;box-shadow:0 4px 0 rgba(0,0,0,.28);transition:transform .15s,box-shadow .15s}
+.cta:active{transform:translateY(3px);box-shadow:0 1px 0 rgba(0,0,0,.28)}
+.cta[disabled]{opacity:.4;cursor:not-allowed}
+/* whole bars */
+h2{font:800 clamp(32px,5vw,56px)/1 var(--serif);letter-spacing:-.03em;margin:80px 0 28px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:26px}
+.card{border-radius:26px;padding:26px;min-height:450px;display:flex;flex-direction:column;justify-content:flex-end;color:#fff;position:relative;overflow:hidden;transition:transform .3s cubic-bezier(.3,1.6,.5,1)}
+.card:hover{transform:rotate(-2.2deg) translateY(-6px)}
+.card::before{content:"";position:absolute;inset:14px;border:2px solid rgba(255,255,255,.55);border-radius:16px;pointer-events:none}
+.card::after{content:"";position:absolute;top:-40%;left:-30%;width:70%;height:200%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.25),transparent);transform:rotate(20deg) translateX(-120%);transition:transform .8s}
+.card:hover::after{transform:rotate(20deg) translateX(520%)}
+.card h3{font:800 34px/1 var(--serif);margin:0 0 8px;letter-spacing:-.02em}
+.card p{margin:0 0 18px;font-size:15px;max-width:26ch}
+.card .row{display:flex;justify-content:space-between;align-items:center;position:relative;z-index:1}
+.card .row b{font:800 24px var(--serif)}
+.add{background:#fff;color:#2a1117;border:0;border-radius:99px;padding:10px 20px;font-weight:600}
+.band{margin-top:80px;background:var(--cocoa);color:#f8dcd6;border-radius:28px;padding:clamp(26px,5vw,56px);display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:26px}
+.band h3{font:800 24px/1.1 var(--serif);margin:0 0 6px;color:var(--foil)}
+.band p{margin:0;font-size:16px}
+footer{text-align:center;padding:40px 20px 70px;opacity:.75;font-size:15px}
+body{background-image:radial-gradient(circle at 88% -8%,color-mix(in srgb,var(--ruby) 32%,transparent),transparent 42%),radial-gradient(circle at -5% 55%,color-mix(in srgb,var(--pist) 28%,transparent),transparent 38%)}
+h1 em{background:linear-gradient(90deg,var(--ruby),var(--foil));-webkit-background-clip:text;background-clip:text;color:transparent}
+.stage{box-shadow:0 30px 60px -20px rgba(42,17,23,.55)}
+.art{position:relative;z-index:1;width:100%;max-width:250px;align-self:center;margin:0 0 auto;filter:drop-shadow(0 16px 14px rgba(0,0,0,.3));transform:rotate(-6deg);transition:transform .45s cubic-bezier(.3,1.6,.5,1)}
+.card:hover .art{transform:rotate(3deg) scale(1.07)}
+.card h3,.card p,.card .row{position:relative;z-index:1}
+.ing{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px}
+.ingi{background:var(--panel);border:2px solid var(--line);border-radius:24px;padding:22px;text-align:center}
+.ingi svg{width:104px;height:104px;transition:transform .5s cubic-bezier(.3,1.6,.5,1)}
+.ingi:hover svg{transform:rotate(14deg) scale(1.12)}
+.ingi h3{font:800 22px var(--serif);margin:10px 0 4px}
+.ingi p{margin:0;font-size:15px}
+/* bag */
+aside{position:fixed;top:0;right:0;bottom:0;width:min(400px,100%);background:var(--panel);border-left:2px solid var(--line);transform:translateX(105%);transition:transform .4s cubic-bezier(.2,.9,.3,1);z-index:20;display:flex;flex-direction:column;padding:calc(22px + env(safe-area-inset-top,0px)) 24px calc(22px + env(safe-area-inset-bottom,0px))}
+aside.open{transform:none}
+aside h4{font:800 28px var(--serif);margin:0 0 12px;display:flex;justify-content:space-between}
+aside h4 button{background:none;border:0;font-size:28px;line-height:1}
+#lines{flex:1;overflow:auto;margin:0;padding:0;list-style:none}
+#lines li{display:flex;justify-content:space-between;gap:10px;padding:12px 0;border-bottom:1px solid var(--line)}
+#lines button{background:none;border:0;opacity:.6;margin-left:8px}
+.total{display:flex;justify-content:space-between;font:800 24px var(--serif);padding:16px 0}
+#toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translate(-50%,160%);background:var(--ink);color:var(--bg);padding:12px 22px;border-radius:99px;font-weight:600;transition:transform .35s cubic-bezier(.3,1.5,.5,1);z-index:30;max-width:92vw;text-align:center}
+#toast.show{transform:translate(-50%,0)}
+@media (max-width:560px){.hint{margin-left:0;width:100%}.bar{grid-template-columns:repeat(6,1fr)}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">Temper<i>.</i></div>
+  <button class="bagbtn" id="open" aria-label="Open bag">Bag<b id="count">0</b></button>
+</header>
+<main>
+  <h1>Snap a square. <em>Build your box.</em></h1>
+  <p class="lede">Every bar here is a catalog. Break off the flavors you want, one square at a time, and we’ll wrap them. Careful: leave it in the sun and it melts.</p>
+
+  <section class="stage" aria-label="Snap-a-square chocolate bar">
+    <div class="bar" id="bar"></div>
+    <div class="drips" id="drips" aria-hidden="true"></div>
+    <div class="controls">
+      <label for="heat">Room temperature</label>
+      <input type="range" id="heat" min="0" max="100" value="0">
+      <span class="hint" id="hint" aria-live="polite">Snap-ready. Tap a square.</span>
+    </div>
+  </section>
+
+  <div class="tray">
+    <div class="chips" id="chips"></div>
+    <button class="cta" id="addbox" disabled>Add squares to bag</button>
+  </div>
+
+  <h2>Or take the whole bar.</h2>
+  <div class="grid" id="bars"></div>
+
+  <h2>What goes inside.</h2>
+  <div class="ing" id="ing"></div>
+
+  <section class="band">
+    <div><h3>Tempered by hand</h3><p>Each batch is melted, cooled and warmed again until it snaps clean.</p></div>
+    <div><h3>Wrapped in foil</h3><p>Every square travels in a recycled foil wrapper inside a cocoa-dusted box.</p></div>
+    <div><h3>Ships cool</h3><p>Insulated packaging, so your order arrives firm even in summer.</p></div>
+  </section>
+</main>
+<footer>Temper Chocolate Co. Demo store, nothing is actually shipped.</footer>
+
+<aside id="bag" aria-label="Shopping bag">
+  <h4>Your bag <button id="close" aria-label="Close bag">×</button></h4>
+  <ul id="lines"></ul>
+  <div class="total"><span>Total</span><span id="total">₹0</span></div>
+  <button class="cta" id="checkout" disabled>Checkout</button>
+</aside>
+<div id="toast" role="status"></div>
+
+<script>
+(function(){
+  var F=[["Sea salt dark","#5a2a1a"],["Ruby raspberry","#d6336c"],["Pistachio","#8fb06e"],["Hazelnut praline","#8a5530"],["Orange zest","#cf7a2e"],["Chili ember","#9a2020"]];
+  var order=[0,1,2,3,4,5,3,4,0,1,5,2,2,5,1,0,4,3], SQ=70;
+  var BARS=[["Midnight 70%","Dark chocolate with sea salt and toasted cocoa nibs.",480,"linear-gradient(150deg,#5a2a1a,#2a1117)"],
+            ["Ruby Blush","Pink ruby chocolate with freeze-dried raspberry.",520,"linear-gradient(150deg,#e2527f,#a3174f)"],
+            ["Pistachio Gold","White chocolate, roasted pistachio and gold dust.",560,"linear-gradient(150deg,#8fb06e,#4f7a3a)"]];
+  var bar=document.getElementById("bar"),drips=document.getElementById("drips"),heat=document.getElementById("heat"),
+      hint=document.getElementById("hint"),chips=document.getElementById("chips"),addbox=document.getElementById("addbox"),
+      lines=document.getElementById("lines"),bag=document.getElementById("bag"),toastEl=document.getElementById("toast");
+  var cart={},h=0,snapped={},tt;
+  function art(i){
+    var C=[["#7a3a26","#2a1117"],["#f58ab0","#b01d56"],["#f6f1dc","#cdb978"]][i],id="g"+i,s="";
+    for(var r=0;r<3;r++)for(var k=0;k<5;k++){var x=62+k*26,y=36+r*26;
+      s+='<rect x="'+x+'" y="'+y+'" width="23" height="23" rx="4" fill="url(#'+id+')"/><rect x="'+(x+4)+'" y="'+(y+4)+'" width="15" height="15" rx="3" fill="none" stroke="rgba(255,255,255,.28)"/>';}
+    var T=[
+      [[150,124],[172,118],[132,128],[186,128]].map(function(p){return '<path d="M'+p[0]+' '+p[1]+'l7 -3 3 6 -7 4z" fill="#fff" opacity=".9"/>'}).join(""),
+      [[170,122],[188,126],[156,130]].map(function(p){return '<circle cx="'+p[0]+'" cy="'+p[1]+'" r="9" fill="#d12a63"/><circle cx="'+(p[0]-3)+'" cy="'+(p[1]-3)+'" r="2.5" fill="#fff" opacity=".5"/>'}).join(""),
+      [[160,124],[180,128],[142,130]].map(function(p){return '<ellipse cx="'+p[0]+'" cy="'+p[1]+'" rx="8" ry="5.5" fill="#8fb06e" transform="rotate(-20 '+p[0]+' '+p[1]+')"/>'}).join("")];
+    return '<svg class="art" viewBox="0 0 230 160" aria-hidden="true"><defs><linearGradient id="'+id+'" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="'+C[0]+'"/><stop offset="1" stop-color="'+C[1]+'"/></linearGradient><linearGradient id="'+id+'f" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f7dc8c"/><stop offset=".5" stop-color="#d9a02e"/><stop offset="1" stop-color="#8a5f12"/></linearGradient></defs><ellipse cx="120" cy="134" rx="90" ry="9" fill="rgba(0,0,0,.28)"/><rect x="56" y="30" width="136" height="84" rx="8" fill="rgba(0,0,0,.2)"/>'+s+'<path d="M26 30 L88 26 L92 118 L22 114Z" fill="url(#'+id+'f)"/><path d="M34 34 L40 110 M48 32 L54 112 M62 31 L68 114 M76 29 L80 116" stroke="rgba(255,255,255,.4)" stroke-width="2" fill="none"/>'+T[i]+'</svg>';
+  }
+  var rb=[[38,40],[58,38],[28,56],[48,54],[68,54],[38,70],[58,70],[48,84]].map(function(p){return '<circle cx="'+p[0]+'" cy="'+p[1]+'" r="12" fill="url(#rb)"/><circle cx="'+(p[0]-4)+'" cy="'+(p[1]-4)+'" r="2.5" fill="#fff" opacity=".45"/>'}).join("");
+  var seg="";for(var a=0;a<8;a++){var t=a*Math.PI/4;seg+='<line x1="50" y1="50" x2="'+(50+32*Math.cos(t)).toFixed(1)+'" y2="'+(50+32*Math.sin(t)).toFixed(1)+'" stroke="#f08a24" stroke-width="3"/>'}
+  var ING=[
+    ["Raspberry","Freeze-dried and folded into ruby chocolate.",'<svg viewBox="0 0 100 100" aria-hidden="true"><defs><radialGradient id="rb" cx=".35" cy=".3"><stop offset="0" stop-color="#ff7aa5"/><stop offset="1" stop-color="#a3174f"/></radialGradient></defs>'+rb+'<path d="M44 28 Q50 8 68 14 Q60 30 44 28Z" fill="#6f9a4a"/></svg>'],
+    ["Pistachio","Roasted whole, then cracked over the bar by hand.",'<svg viewBox="0 0 100 100" aria-hidden="true"><defs><radialGradient id="pk" cx=".4" cy=".3"><stop offset="0" stop-color="#c4e08e"/><stop offset="1" stop-color="#5f8f3a"/></radialGradient></defs><ellipse cx="50" cy="54" rx="28" ry="37" fill="#e8d9b0" stroke="#c2ae7a" stroke-width="3" transform="rotate(18 50 54)"/><ellipse cx="50" cy="56" rx="15" ry="26" fill="url(#pk)" transform="rotate(18 50 56)"/></svg>'],
+    ["Orange","Zest is grated into the chocolate while it’s still warm.",'<svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="42" fill="#f08a24"/><circle cx="50" cy="50" r="35" fill="#ffb347"/>'+seg+'<circle cx="50" cy="50" r="5" fill="#fff3d6"/></svg>'],
+    ["Cocoa bean","Slow-roasted so it keeps its deep, fruity edge.",'<svg viewBox="0 0 100 100" aria-hidden="true"><defs><linearGradient id="cb" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#9a5a3a"/><stop offset="1" stop-color="#3a1a10"/></linearGradient></defs><g transform="rotate(-32 50 50)"><ellipse cx="50" cy="50" rx="24" ry="38" fill="url(#cb)"/><path d="M50 14 Q44 50 50 86" stroke="#2a1117" stroke-width="3" fill="none"/><ellipse cx="40" cy="34" rx="4" ry="11" fill="#fff" opacity=".18"/></g></svg>']];
+  function rnd(a,b){return (Math.random()*(b-a)+a).toFixed(1)}
+  function rupee(n){return "₹"+n}
+  function toast(t){toastEl.textContent=t;toastEl.classList.add("show");clearTimeout(tt);tt=setTimeout(function(){toastEl.classList.remove("show")},2200)}
+
+  bar.innerHTML=order.map(function(f,i){
+    return '<button class="sq" data-i="'+i+'" data-f="'+f+'" style="--c:'+F[f][1]+';--i:'+i+';--d:'+rnd(6,34)+';--r:'+rnd(-9,9)+'" aria-label="'+F[f][0]+' square, '+rupee(SQ)+'"><span class="face"></span></button>';
+  }).join("");
+  drips.innerHTML=Array.from({length:12},function(){return '<span style="--l:'+rnd(24,90)+'"></span>'}).join("");
+  setTimeout(function(){bar.classList.add("ready")},1800);
+
+  function renderTray(){
+    var n=0,html="";
+    Object.keys(snapped).forEach(function(i){n++});
+    var counts={};
+    Object.keys(snapped).forEach(function(i){var f=order[i];counts[f]=(counts[f]||0)+1});
+    Object.keys(counts).forEach(function(f){html+='<span class="chip" style="--c:'+F[f][1]+'"><i></i>'+F[f][0]+' ×'+counts[f]+'</span>'});
+    chips.innerHTML=html||'<span class="empty">Your box is empty. Snap a square above.</span>';
+    addbox.disabled=!n;
+    addbox.textContent=n?"Add "+n+" square"+(n>1?"s":"")+" · "+rupee(n*SQ):"Add squares to bag";
+  }
+  function renderBag(){
+    var keys=Object.keys(cart),q=0,t=0;
+    lines.innerHTML=keys.length?keys.map(function(k){
+      var c=cart[k];q+=c.q;t+=c.q*c.p;
+      return '<li><span>'+k+' ×'+c.q+'</span><span>'+rupee(c.q*c.p)+'<button data-rm="'+k+'" aria-label="Remove '+k+'">×</button></span></li>';
+    }).join(""):'<li>Your bag is empty.</li>';
+    document.getElementById("count").textContent=q;
+    document.getElementById("total").textContent=rupee(t);
+    document.getElementById("checkout").disabled=!keys.length;
+  }
+  function add(name,p,q){cart[name]=cart[name]||{p:p,q:0};cart[name].q+=q;renderBag()}
+
+  bar.addEventListener("click",function(e){
+    var b=e.target.closest(".sq");if(!b)return;
+    var i=b.dataset.i;
+    if(b.classList.contains("gone")){b.classList.remove("gone");delete snapped[i];renderTray();return}
+    if(h>.6){toast("Too soft to snap. Cool it down first.");return}
+    b.classList.add("gone");snapped[i]=1;renderTray();
+  });
+  bar.addEventListener("mouseover",function(e){
+    var b=e.target.closest(".sq");if(b&&h<=.35)hint.textContent=F[b.dataset.f][0]+" · "+rupee(SQ);
+  });
+  heat.addEventListener("input",function(){
+    h=heat.value/100;bar.style.setProperty("--h",h);drips.style.setProperty("--h",h);
+    hint.textContent=h<.35?"Snap-ready. Tap a square.":h<.7?"Softening…":"Too warm. Back in the fridge!";
+  });
+  addbox.addEventListener("click",function(){
+    var counts={};
+    Object.keys(snapped).forEach(function(i){var f=order[i];counts[f]=(counts[f]||0)+1});
+    Object.keys(counts).forEach(function(f){add(F[f][0]+" square",SQ,counts[f])});
+    bar.querySelectorAll(".gone").forEach(function(b){b.classList.remove("gone")});
+    snapped={};renderTray();toast("Squares added to your bag");
+  });
+  document.getElementById("bars").innerHTML=BARS.map(function(b,i){
+    return '<article class="card" style="background:'+b[3]+'">'+art(i)+'<h3>'+b[0]+'</h3><p>'+b[1]+'</p><div class="row"><b>'+rupee(b[2])+'</b><button class="add" data-b="'+i+'">Add bar</button></div></article>';
+  }).join("");
+  document.getElementById("ing").innerHTML=ING.map(function(g){return '<div class="ingi">'+g[2]+'<h3>'+g[0]+'</h3><p>'+g[1]+'</p></div>'}).join("");
+  document.getElementById("bars").addEventListener("click",function(e){
+    var a=e.target.closest(".add");if(!a)return;
+    var b=BARS[a.dataset.b];add(b[0]+" bar",b[2],1);toast(b[0]+" added to your bag");
+  });
+  lines.addEventListener("click",function(e){var k=e.target.dataset.rm;if(k){delete cart[k];renderBag()}});
+  document.getElementById("open").onclick=function(){bag.classList.add("open")};
+  document.getElementById("close").onclick=function(){bag.classList.remove("open")};
+  document.getElementById("checkout").onclick=function(){cart={};renderBag();bag.classList.remove("open");toast("Order placed. This is a demo store.")};
+  document.addEventListener("keydown",function(e){if(e.key==="Escape")bag.classList.remove("open")});
+  renderTray();renderBag();
+})();
+</script>
+</body>
+</html>
